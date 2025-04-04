@@ -1,0 +1,340 @@
+:root {
+    /* color scheme */
+    --background: rgb(18, 18, 18); /* very dark grey */
+    --foreground: rgb(220, 220, 220); /* light grey/off-white */
+    --primary: rgb(205, 92, 92); /* indian red */
+    --secondary: rgb(80, 80, 80); /* darker grey for borders/bg */
+    --comment: rgb(100, 100, 100); /* grey for comment-like text */
+
+    /* fonts */
+    --font-heading: 'VT323', monospace;
+    --font-body: 'Roboto Mono', monospace; /* using roboto mono for better readability */
+
+    /* other */
+    --scanline-opacity: 0.05;
+    --border-width: 1px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 1rem; /* adjusted padding */
+    position: relative; /* needed for scanlines */
+    overflow-x: hidden;
+}
+
+/* subtle scanline effect */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, var(--scanline-opacity)),
+        rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+        transparent 1px,
+        transparent 3px /* adjust line spacing */
+    );
+    pointer-events: none; /* allow clicks through */
+    z-index: 10; /* ensure it's above background but below content */
+}
+
+
+/* layout */
+.split-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px; /* slightly narrower */
+    width: 100%;
+    gap: 1.5rem;
+    z-index: 1; /* content above scanlines */
+    position: relative;
+}
+
+/* base terminal container style */
+.terminal-container {
+    background-color: rgba(var(--secondary), 0.2); /* slightly transparent dark bg */
+    border: var(--border-width) solid var(--primary); /* indian red border */
+    padding: 1.5rem;
+    width: 100%;
+    border-radius: 0; /* sharp corners */
+    box-shadow: none; /* remove shadow */
+    backdrop-filter: none; /* remove blur */
+}
+
+/* specific container adjustments */
+.nav-container {
+    text-align: center;
+    margin-bottom: 1rem;
+    border-bottom-width: calc(var(--border-width) * 2); /* thicker bottom border */
+}
+
+/* nav container content */
+.nav-container h1 {
+    font-family: var(--font-heading);
+    font-size: 3.5rem; /* larger heading font */
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+    display: inline-block; /* necessary for cursor alignment */
+    position: relative;
+}
+
+.nav-container h1 .highlight {
+    color: var(--primary); /* indian red */
+}
+
+/* blinking cursor animation */
+.cursor {
+    display: inline-block;
+    background-color: var(--foreground);
+    width: 0.7ch; /* character width */
+    height: 1em; /* character height */
+    margin-left: 0.2ch;
+    animation: blink 1s step-end infinite;
+    vertical-align: baseline; /* align with text */
+}
+
+@keyframes blink {
+    from, to { background-color: transparent; }
+    50% { background-color: var(--foreground); }
+}
+
+.nav-container p {
+    color: var(--comment); /* comment style */
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+}
+
+.contact {
+    margin-top: 1rem;
+}
+
+.contact p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--foreground);
+}
+
+.contact a,
+.work-item a,
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.1s linear, color 0.1s linear; /* faster transition */
+    padding: 0.1em 0.3em; /* slight padding for hover effect */
+    display: inline-block; /* ensure padding works */
+}
+
+.contact a:hover,
+.work-item a:hover,
+.footer a:hover {
+    background-color: var(--primary);
+    color: var(--background); /* invert colors on hover */
+    text-decoration: none;
+}
+
+/* main content */
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* section headers */
+#work h2, #about h2, .languages h3 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    text-align: left; /* align left */
+    margin-bottom: 1.5rem;
+    color: var(--primary); /* indian red */
+    border-bottom: var(--border-width) dashed var(--secondary); /* dashed underline */
+    padding-bottom: 0.3rem;
+    display: inline-block; /* fit content width */
+}
+
+/* work section */
+.work-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* work item style */
+.terminal-item {
+    border: var(--border-width) solid var(--secondary); /* darker border */
+    padding: 1rem;
+    background-color: transparent; /* no separate bg */
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
+    transition: border-color 0.1s linear; /* faster transition */
+}
+
+.terminal-item:hover {
+    border-color: var(--primary); /* highlight border on hover */
+    background-color: rgba(var(--primary), 0.05); /* very subtle bg tint */
+}
+
+.work-item h3 {
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: var(--font-body); /* use body font for consistency */
+}
+
+.work-item p {
+    color: var(--comment); /* comment style */
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    flex-grow: 1;
+}
+
+.work-item a {
+    margin-top: auto;
+    align-self: flex-start; /* align link left */
+}
+
+/* languages used icons */
+.languages-used {
+    margin-bottom: 0.8rem;
+    font-size: 1.6rem; /* slightly smaller icons */
+    color: var(--foreground); /* match text color */
+    display: flex;
+    justify-content: flex-start; /* align left */
+    gap: 0.5rem;
+}
+
+.languages-used i:hover {
+    color: var(--primary); /* highlight on hover */
+}
+
+
+/* about section */
+#about p {
+    line-height: 1.6;
+    color: var(--foreground);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+#about p > .highlight { /* style highlight within paragraph */
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* languages & tools icons */
+.languages {
+    margin-top: 1.5rem;
+}
+
+.languages ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* align left */
+    gap: 1rem;
+    padding: 0;
+}
+
+.languages li {
+    display: inline-block;
+}
+
+.languages i {
+    font-size: 2rem; /* adjust size */
+    color: var(--foreground);
+    transition: color 0.1s linear;
+}
+
+.languages i:hover {
+    color: var(--primary);
+}
+
+/* footer */
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.85rem;
+    border-top: var(--border-width) solid var(--secondary);
+    margin-top: 2rem;
+    width: 100%;
+    color: var(--comment); /* comment style */
+}
+
+.footer a {
+    margin: 0 0.3em;
+}
+
+/* fade-in animation (keep for now) */
+.fade-in {
+  animation: fadeInAnimation 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInAnimation {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#work.fade-in {
+    animation-delay: 0.1s;
+}
+#about.fade-in {
+    animation-delay: 0.2s;
+}
+
+
+/* responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem; /* reduce padding */
+    }
+
+    .split-layout {
+        max-width: 100%; /* full width */
+    }
+
+    .nav-container h1 {
+        font-size: 2.5rem; /* adjust size */
+    }
+
+    #work h2, #about h2, .languages h3 {
+        font-size: 1.5rem; /* adjust size */
+    }
+
+    .work-list {
+        grid-template-columns: 1fr; /* single column */
+    }
+
+    .languages ul {
+        gap: 0.8rem;
+    }
+
+    .languages i {
+        font-size: 1.8rem;
+    }
+}
+
